@@ -7,6 +7,7 @@ use App\Http\Resources\ProductCollection;
 use App\Http\Resources\ProductResource;
 use App\Models\Product;
 use Illuminate\Http\Request;
+use Validator;
 
 class ApiProductController extends Controller
 {
@@ -18,7 +19,7 @@ class ApiProductController extends Controller
     public function index()
     {
         //
-        $products = Product::with('brand','productCategories')->orderByDesc('id')->paginate(5);
+        $products = Product::with('brand', 'productCategories')->orderByDesc('id')->paginate(5);
         return new ProductCollection($products);
     }
 
@@ -32,78 +33,81 @@ class ApiProductController extends Controller
         //
     }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(Request $request)
+
+    public function getAll(Request $request)
     {
-        //
-        $request->validate([
-            'brand_id'=> 'required',
-            'product_category_id'=> 'required',
-            'name'=> 'required',
-            'description'=> 'required',
-            'content'=> 'required',
-            'price'=> 'required',
-            'qty'=> 'required',
-            'discount'=> 'required',
-            'rating'=> 'required'
+        return Product::all();
+    }
+    public function addNew(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'brand_id' => 'required',
+            'product_category_id' => 'required',
+            'name' => 'required',
+            'description' => 'required',
+            'content' => 'required',
+            'price' => 'required',
+            'qty' => 'required',
+            'discount' => 'required',
+            'rating' => 'required'
         ]);
+
+        if ($validator->fails()) {
+            return response()->json($validator->errors()->toJson(), 400);
+        }
+
         $product = new Product($request->all());
         $product->save();
         return new ProductResource($product);
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function show(Product $product)
+
+    public function show($productId)
     {
-        //
-        return new ProductResource($product);
+        $product = Product::find($productId);
+        if (is_null($product)) {
+            return response()->json(['error' => 'Product Not Found'], 404);
+        }
+        return response()->json(
+            $product
+        );
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
+
     public function edit($id)
     {
-        
+
     }
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, Product $product)
+
+    public function update(Request $request)
     {
-        
+        $validator = Validator::make($request->all(), [
+            'id' => 'required'
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json($validator->errors()->toJson(), 400);
+        }
+
+        $product = Product::find($request->id);
+        if (is_null($product)) {
+            return response()->json(['error' => 'Product Not Found'], 404);
+        }
+
         $product->update($request->all());
         return new ProductResource($product);
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy(Product $product)
+
+    public function delete($productId)
     {
-        //
-        $product->delete();
+        $product = Product::find($productId);
+        if (is_null($product)) {
+            return response()->json(['error' => 'Product Not Found'], 404);
+        }
+
+        return $product->delete();
     }
 
     public function search(Request $request)
@@ -114,6 +118,6 @@ class ApiProductController extends Controller
             ->orderByDesc('id')
             ->paginate(5);
 
-            return new ProductResource($products);
+        return new ProductResource($products);
     }
 }
