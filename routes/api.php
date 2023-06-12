@@ -9,6 +9,7 @@ use App\Http\Controllers\api\ApiRegistereController;
 use App\Http\Controllers\api\LoginController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\api\AuthController;
 
 /*
 |--------------------------------------------------------------------------
@@ -29,7 +30,7 @@ Route::get('products/search', [ApiProductController::class, 'search']);
 //Api thêm xóa sửa hiện thị , chi tiết sản phẩm
 Route::resource('products', ApiProductController::class);
 //api phân sản phẩm theo brand
-Route::POST('getProductListFilte',[ ApiProductListController::class,'getProductListFilte']);
+Route::POST('getProductListFilte', [ApiProductListController::class, 'getProductListFilte']);
 // Route::POST('getProductOfBrandFilte',[ ApiProductListController::class,'getProductOfBrandFilte']);
 
 //api login
@@ -45,3 +46,17 @@ Route::resource('carts', ApiCartController::class);
 //api review
 Route::resource('comments', ApiCommentController::class);
 
+
+
+//==== AUTH APIS =====
+Route::group([
+    'middleware' => 'api',
+    'prefix' => 'auth'
+], function ($router) {
+    Route::post('/login', [AuthController::class, 'login']);
+    Route::post('/register', [AuthController::class, 'register']);
+    Route::post('/logout', [AuthController::class, 'logout']);
+    Route::post('/refresh', [AuthController::class, 'refresh']);
+    Route::get('/user-profile', [AuthController::class, 'userProfile']);
+    Route::post('/change-password', [AuthController::class, 'changePassWord']);
+});

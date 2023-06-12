@@ -16,7 +16,8 @@
         "laravel/passport": "^10.4",
         "laravel/sanctum": "^2.15",
         "laravel/tinker": "^2.0",
-        "spatie/laravel-permission": "^5.10"
+        "spatie/laravel-permission": "^5.10",
+        "tymon/jwt-auth": "^1.0@dev"
     },
     "require-dev": {
         "facade/ignition": "^2.3.6",
