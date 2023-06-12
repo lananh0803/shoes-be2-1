@@ -33,10 +33,22 @@ class ApiProductController extends Controller
         //
     }
 
+    public function getNewsProduct(Request $request)
+    {
+        $products = Product::with('productDetails', 'productImages', 'productComments')->orderBy('updated_at', 'DESC')->take(8)->get();
+        return $products;
+    }
+
+    public function getHotsProduct(Request $request)
+    {
+        $products = Product::with('productDetails', 'productImages', 'productComments')->orderBy('rating', 'DESC')->take(10)->get();
+        return $products;
+    }
+
 
     public function getAll(Request $request)
-    {   
-        $products = Product::with('productDetails','productImages','productComments')->get();
+    {
+        $products = Product::with('productDetails', 'productImages', 'productComments')->orderBy('updated_at', 'DESC')->get();
         return $products;
     }
     public function addNew(Request $request)
@@ -69,6 +81,9 @@ class ApiProductController extends Controller
         if (is_null($product)) {
             return response()->json(['error' => 'Product Not Found'], 404);
         }
+        $product->product_images = $product->productImages;
+        $product->product_details = $product->productDetails;
+        $product->product_comments = $product->productComments;
         return response()->json(
             $product
         );

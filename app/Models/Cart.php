@@ -11,7 +11,7 @@ class Cart extends Model
     protected $table = 'carts';
     protected $primarykey = 'id';
     protected $guarded = [];
-    protected $fillable = ['user_id','total_price'];
+    protected $fillable = ['user_id', 'total_price'];
 
     public function user()
     {

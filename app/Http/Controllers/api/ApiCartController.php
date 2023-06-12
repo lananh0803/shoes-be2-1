@@ -10,9 +10,16 @@ use App\Models\CartItem;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Validator;
+use App\Models\Product;
 
 class ApiCartController extends Controller
 {
+    public function __construct()
+    {
+        // Những hàm không cần chứng thực bằng jwt
+        $this->middleware('auth:api', ['except' => []]);
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -41,32 +48,55 @@ class ApiCartController extends Controller
         //
     }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
     public function addnew(Request $request)
     {
+        $user_id = auth()->user()->id;
         $validator = Validator::make($request->all(), [
-            'user_id' => 'required', 
-            'total_price' => 'required'
+            'product_id' => 'required',
+            'size' => 'required',
+            'quantity' => 'required',
         ]);
+
         if ($validator->fails()) {
             return response()->json($validator->errors()->toJson(), 400);
         }
-        $carts = new Cart($request->all());
-        $carts->save();
-        $cartItem = new CartItem();
-        $cartItem->cart_id = $carts->id;
-        $cartItem->product_id = $request->input('product_id');
-        $cartItem->size = $request->input('size');
-        $cartItem->qty = $request->input('quantity');
-        $cartItem->price = $request->input('price') * $request->input('quantity');
-        $cartItem->save();
-        $carts->cartItems()->save($cartItem);
-        return new ProductResource($carts);
+
+        $existingCart = Cart::where('user_id', $user_id)->first();
+        $product = Product::find($request->product_id);
+
+        if (is_null($existingCart)) {
+            $carts = new Cart(['user_id' => $user_id, 'total_price' => 0]);
+            $carts->save();
+            $cartItem = new CartItem();
+            $cartItem->cart_id = $carts->id;
+            $cartItem->product_id = $request->product_id;
+            $cartItem->size = $request->size;
+            $cartItem->qty = $request->quantity;
+            $cartItem->price = $product->price * $request->quantity;
+            $cartItem->save();
+            $carts->cartItems()->save($cartItem);
+            return $cartItem;
+
+        } else {
+            $existingCartItem = CartItem::where('cart_id', '=', $existingCart->id)->where('product_id', '=', $request->product_id)->first();
+
+            if (is_null($existingCartItem)) {
+                $cartItem = new CartItem();
+                $cartItem->cart_id = $existingCart->id;
+                $cartItem->product_id = $request->product_id;
+                $cartItem->size = $request->size;
+                $cartItem->qty = $request->quantity;
+                $cartItem->price = $product->price * $request->quantity;
+                $cartItem->save();
+                $existingCart->cartItems()->save($cartItem);
+                return $existingCart;
+            } else {
+                $existingCartItem->qty = $existingCartItem->qty + $request->quantity;
+                $existingCartItem->price = $product->price * $existingCartItem->qty;
+                $existingCartItem->save();
+                return $existingCartItem;
+            }
+        }
     }
 
     /**

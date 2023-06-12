@@ -70,11 +70,15 @@ Route::group([
     'prefix' => 'product'
 ], function ($router) {
     Route::get('/all', [ApiProductController::class, 'getAll']);
-    Route::get('/{productId}', [ApiProductController::class, 'show']);
     Route::post('/', [ApiProductController::class, 'addNew']);
     Route::put('/', [ApiProductController::class, 'update']);
     Route::delete('/{productId}', [ApiProductController::class, 'delete']);
+    Route::get('/news', [ApiProductController::class, 'getNewsProduct']);
+    Route::get('/hots', [ApiProductController::class, 'getHotsProduct']);
+    Route::get('/{productId}', [ApiProductController::class, 'show']);
 });
+
+
 //brand APIS
 Route::group([
     'middleware' => 'api',
@@ -86,6 +90,7 @@ Route::group([
     Route::put('/', [ApiBrandController::class, 'update']);
     Route::delete('/{brandId}', [ApiBrandController::class, 'delete']);
 });
+
 //ProductDetail APIS
 Route::group([
     'middleware' => 'api',
