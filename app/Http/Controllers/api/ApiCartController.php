@@ -35,7 +35,7 @@ class ApiCartController extends Controller
     public function getUserCart(Request $request)
     {
         $id = auth()->user()->id;
-        $cart = Cart::with('cartItems')->where('user_id', $id)->get();
+        $cart = Cart::with('cartItems', 'products')->where('user_id', '=', $id)->first();
         return response()->json($cart);
     }
     /**
@@ -91,6 +91,12 @@ class ApiCartController extends Controller
                 $existingCart->cartItems()->save($cartItem);
                 return $existingCart;
             } else {
+                $quantity = $existingCartItem->qty + $request->quantity;
+                if ($quantity <= 0) {
+                    $existingCartItem->qty = 0;
+                    $existingCartItem->delete();
+                    return $existingCartItem;
+                }
                 $existingCartItem->qty = $existingCartItem->qty + $request->quantity;
                 $existingCartItem->price = $product->price * $existingCartItem->qty;
                 $existingCartItem->save();
