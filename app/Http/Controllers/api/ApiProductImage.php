@@ -2,14 +2,13 @@
 
 namespace App\Http\Controllers\api;
 
-use App\Http\Controllers\Controller;
 use App\Http\Resources\ProductCollection;
 use App\Http\Resources\ProductResource;
+use App\Models\ProductImage;
 use Illuminate\Http\Request;
-use App\Models\Brand;
 use Validator;
 
-class ApiBrandController extends Controller
+class ApiProductImage extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -18,7 +17,8 @@ class ApiBrandController extends Controller
      */
     public function index()
     {
-        return new ProductCollection(Brand::all());
+        $productImages = ProductImage::orderByDesc('id')->get();
+        return new ProductCollection($productImages);
     }
 
     /**
@@ -32,7 +32,7 @@ class ApiBrandController extends Controller
     }
     public function getAll(Request $request)
     {
-        return Brand::all();
+        return ProductImage::all();
     }
     /**
      * Store a newly created resource in storage.
@@ -43,14 +43,17 @@ class ApiBrandController extends Controller
     public function addNew(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'name' => 'required',     
+            'product_id'=> 'required',
+            'path' => 'required'
         ]);
+
         if ($validator->fails()) {
             return response()->json($validator->errors()->toJson(), 400);
         }
-        $brands = new Brand($request->all());
-        $brands->save();
-        return new ProductResource($brands);
+
+        $productImage = new ProductImage($request->all());
+        $productImage->save();
+        return new ProductResource($productImage);
     }
 
     /**
@@ -59,14 +62,15 @@ class ApiBrandController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($brandId)
+    public function show($productImageId)
     {
-        $brand = Brand::find($brandId);
-        if (is_null($brand)) {
+        $productImage = ProductImage::find($productImageId);
+        if (is_null($productImage)) {
             return response()->json(['error' => 'Product Not Found'], 404);
         }
-        return response()->json($brand);
-      
+        return response()->json(
+            $productImage
+        );
     }
 
     /**
@@ -97,13 +101,13 @@ class ApiBrandController extends Controller
             return response()->json($validator->errors()->toJson(), 400);
         }
 
-        $brand = Brand::find($request->id);
-        if (is_null($brand)) {
+        $productImage = ProductImage::find($request->id);
+        if (is_null($productImage)) {
             return response()->json(['error' => 'Product Not Found'], 404);
         }
 
-        $brand->update($request->all());
-        return new ProductResource($brand);
+        $productImage->update($request->all());
+        return new ProductResource($productImage);
     }
 
     /**
@@ -112,12 +116,12 @@ class ApiBrandController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function delete($brandId)
+    public function delete($productImageId)
     {
-        $brand = Brand::find($brandId);
-        if (is_null($brand)) {
+        $productImage = ProductImage::find($productImageId);
+        if (is_null($productImage)) {
             return response()->json(['error' => 'Product Not Found'], 404);
         }
-        return $brand->delete();
+        return $productImage->delete();
     }
 }

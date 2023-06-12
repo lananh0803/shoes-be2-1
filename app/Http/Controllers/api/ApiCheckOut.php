@@ -5,11 +5,12 @@ namespace App\Http\Controllers\api;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\ProductCollection;
 use App\Http\Resources\ProductResource;
+use App\Models\Order;
+use App\Models\OrderDetail;
 use Illuminate\Http\Request;
-use App\Models\Brand;
 use Validator;
 
-class ApiBrandController extends Controller
+class ApiCheckOut extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -18,9 +19,13 @@ class ApiBrandController extends Controller
      */
     public function index()
     {
-        return new ProductCollection(Brand::all());
+        //
     }
-
+    public function getAll(Request $request)
+    {
+        $order = Order::with('orderDetails')->get();
+        return $order;
+    }
     /**
      * Show the form for creating a new resource.
      *
@@ -30,10 +35,7 @@ class ApiBrandController extends Controller
     {
         //
     }
-    public function getAll(Request $request)
-    {
-        return Brand::all();
-    }
+
     /**
      * Store a newly created resource in storage.
      *
@@ -43,14 +45,27 @@ class ApiBrandController extends Controller
     public function addNew(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'name' => 'required',     
+            'first_name' => 'required', 
+            'last_name' => 'required',
+            'address' => 'required',
+            'city' => 'required',
+            'country' => 'required',
+            'phone' => 'required'
         ]);
         if ($validator->fails()) {
             return response()->json($validator->errors()->toJson(), 400);
         }
-        $brands = new Brand($request->all());
-        $brands->save();
-        return new ProductResource($brands);
+        $order = new Order($request->all());
+        $order->save();
+        $orderDetail = new OrderDetail();
+        $orderDetail->order_id = $order->id;
+        $orderDetail->product_id = $request->input('product_id');
+        $orderDetail->size = $request->input('size');
+        $orderDetail->qty = $request->input('quantity');
+        $orderDetail->total = $request->input('price') * $request->input('total');
+        $orderDetail->save();
+        $order->orderDetails()->save($orderDetail);
+        return new ProductResource($order);
     }
 
     /**
@@ -59,14 +74,15 @@ class ApiBrandController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($brandId)
+    public function show($orderId)
     {
-        $brand = Brand::find($brandId);
-        if (is_null($brand)) {
+        $order = Order::with('orderDetails')->find($orderId);
+        if (is_null($order)) {
             return response()->json(['error' => 'Product Not Found'], 404);
         }
-        return response()->json($brand);
-      
+        return response()->json(
+            $order
+        );
     }
 
     /**
@@ -97,13 +113,13 @@ class ApiBrandController extends Controller
             return response()->json($validator->errors()->toJson(), 400);
         }
 
-        $brand = Brand::find($request->id);
-        if (is_null($brand)) {
+        $order = Order::with('orderDetails')->find($request->id);
+        if (is_null($order)) {
             return response()->json(['error' => 'Product Not Found'], 404);
         }
 
-        $brand->update($request->all());
-        return new ProductResource($brand);
+        $order->update($request->all());
+        return new ProductResource($order);
     }
 
     /**
@@ -112,12 +128,13 @@ class ApiBrandController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function delete($brandId)
+    public function delete($orderId)
     {
-        $brand = Brand::find($brandId);
-        if (is_null($brand)) {
+        $order = Order::with('orderDetails')->find($orderId);
+        if (is_null($order)) {
             return response()->json(['error' => 'Product Not Found'], 404);
         }
-        return $brand->delete();
+        $order->delete();
+        return $order->orderDetails()->delete();
     }
 }

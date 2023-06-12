@@ -4,9 +4,12 @@ namespace App\Http\Controllers\api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Resources\ProductCollection;
+use App\Http\Resources\ProductResource;
 use App\Models\Cart;
+use App\Models\CartItem;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Validator;
 
 class ApiCartController extends Controller
 {
@@ -22,6 +25,12 @@ class ApiCartController extends Controller
         return new ProductCollection($carts);
     }
 
+    public function getUserCart(Request $request)
+    {
+        $id = auth()->user()->id;
+        $cart = Cart::with('cartItems')->where('user_id', $id)->get();
+        return response()->json($cart);
+    }
     /**
      * Show the form for creating a new resource.
      *
@@ -38,9 +47,26 @@ class ApiCartController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function addnew(Request $request)
     {
-        
+        $validator = Validator::make($request->all(), [
+            'user_id' => 'required', 
+            'total_price' => 'required'
+        ]);
+        if ($validator->fails()) {
+            return response()->json($validator->errors()->toJson(), 400);
+        }
+        $carts = new Cart($request->all());
+        $carts->save();
+        $cartItem = new CartItem();
+        $cartItem->cart_id = $carts->id;
+        $cartItem->product_id = $request->input('product_id');
+        $cartItem->size = $request->input('size');
+        $cartItem->qty = $request->input('quantity');
+        $cartItem->price = $request->input('price') * $request->input('quantity');
+        $cartItem->save();
+        $carts->cartItems()->save($cartItem);
+        return new ProductResource($carts);
     }
 
     /**
@@ -49,9 +75,15 @@ class ApiCartController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show($cartId)
     {
-        //
+        $cart = Cart::with('cartItems')->find($cartId);
+        if (is_null($cart)) {
+            return response()->json(['error' => 'Product Not Found'], 404);
+        }
+        return response()->json(
+            $cart
+        );
     }
 
     /**
@@ -72,9 +104,23 @@ class ApiCartController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request)
     {
-        //
+        $validator = Validator::make($request->all(), [
+            'id' => 'required'
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json($validator->errors()->toJson(), 400);
+        }
+
+        $cart = Cart::find($request->id);
+        if (is_null($cart)) {
+            return response()->json(['error' => 'Product Not Found'], 404);
+        }
+
+        $cart->update($request->all());
+        return new ProductResource($cart);
     }
 
     /**
@@ -83,8 +129,13 @@ class ApiCartController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function delete($cartId)
     {
-        //
+        $cart = Cart::with('cartItems')->find($cartId);
+        if (is_null($cart)) {
+            return response()->json(['error' => 'Product Not Found'], 404);
+        }
+        $cart->delete();
+        return $cart->cartItems()->delete();
     }
 }

@@ -5,8 +5,8 @@ namespace App\Http\Controllers\api;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\ProductCollection;
 use App\Http\Resources\ProductResource;
-use App\Models\Product;
 use Illuminate\Http\Request;
+use App\Models\Product;
 use Validator;
 
 class ApiProductController extends Controller
@@ -35,8 +35,9 @@ class ApiProductController extends Controller
 
 
     public function getAll(Request $request)
-    {
-        return Product::all();
+    {   
+        $products = Product::with('productDetails','productImages','productComments')->get();
+        return $products;
     }
     public function addNew(Request $request)
     {
@@ -106,7 +107,6 @@ class ApiProductController extends Controller
         if (is_null($product)) {
             return response()->json(['error' => 'Product Not Found'], 404);
         }
-
         return $product->delete();
     }
 
