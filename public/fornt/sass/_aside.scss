@@ -1,0 +1,70 @@
+.store{
+    padding-top: 7rem;
+    .container{
+        .row{
+            #aside{
+                .aside{
+                    .aside-title{
+                        text-transform: uppercase;
+                        font-size: 18px;
+                        margin: 15px 0px 20px;
+                        color: #2B2D42;
+                        font-weight: 700;
+                    }
+                    .checkbox-filter{
+                        .input-checkbox{
+                            position: relative;
+                            display: block;
+                            input[type="checkbox"]{
+                                position: absolute;
+                                margin: 8px 0 0;
+                                line-height: normal;
+                                box-sizing: border-box;
+                                padding: 0;
+                                font-family: inherit;
+                                font-size: inherit;
+                                line-height: inherit;   
+                            }
+                            label{
+                                font-size: 12px;
+                                font-weight: 500;
+                                min-height: 20px;
+                                padding-left: 20px;
+                                margin-bottom: 5px;
+                                cursor: pointer;
+                                display: inline-block;
+                                max-width: 100%;
+                            }
+                        }
+                    }
+                    .radio-filter{
+                        .input-radio{
+                            position: relative;
+                            display: block;
+                            input[type="radio"]{
+                                position: absolute;
+                                margin: 8px 0 0;
+                                line-height: normal;
+                                box-sizing: border-box;
+                                padding: 0;
+                                font-family: inherit;
+                                font-size: inherit;
+                                line-height: inherit;   
+                            }
+                            label{
+                                font-size: 12px;
+                                font-weight: 500;
+                                min-height: 20px;
+                                padding-left: 20px;
+                                margin-bottom: 5px;
+                                cursor: pointer;
+                                display: inline-block;
+                                max-width: 100%;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

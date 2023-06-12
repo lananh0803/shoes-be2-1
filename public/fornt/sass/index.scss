@@ -1,0 +1,31 @@
+@import 'variables.scss';
+
+* {
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+}
+
+html {
+    font-family: Arial, Helvetica, sans-serif;
+    scroll-behavior: smooth;
+}
+.row{
+    --bs-gutter-x: 0rem;
+}
+@import 'mixins.scss';
+@import 'header.scss';
+@import 'banner.scss';
+@import 'features.scss';
+@import 'productnew.scss';
+@import 'producthot.scss';
+@import 'backTop.scss';
+@import 'aside.scss';
+@import 'store.scss';
+@import 'productDetail.scss';
+@import 'productRelated.scss';
+@import 'viewCart.scss';
+@import 'checkOut.scss';
+@import 'footer.scss';
+@import 'login.scss';
+
