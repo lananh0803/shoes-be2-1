@@ -22,6 +22,12 @@ class AuthController extends Controller
         $this->middleware('auth:api', ['except' => ['login', 'register']]);
     }
 
+
+    public function getAllUser(Request $request)
+    {
+        return User::with("roles")->orderBy('updated_at', 'DESC')->get();
+    }
+
     /**
      * Get a JWT via given credentials.
      *

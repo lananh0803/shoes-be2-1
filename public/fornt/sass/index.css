@@ -496,9 +496,6 @@ header {
   }
 }
 @media (max-width: 1240px) {
-  .header-links {
-    display: none;
-  }
   .navigation .center {
     display: none;
   }
@@ -3710,4 +3707,4 @@ footer .copyright a:hover {
 .body .nav p {
   color: #e4e0e0;
   font-size: 17px;
-}/*# sourceMappingURL=index.css.map */
+}

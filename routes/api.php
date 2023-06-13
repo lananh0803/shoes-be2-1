@@ -6,7 +6,7 @@ use App\Http\Controllers\api\ApiCheckOut;
 use App\Http\Controllers\api\ApiCommentController;
 use App\Http\Controllers\api\ApiProductController;
 use App\Http\Controllers\api\ApiProductDetail;
-use App\Http\Controllers\api\ApiProductImage;
+use App\Http\Controllers\api\ApiProductImageController;
 use App\Http\Controllers\api\ApiProductListController;
 use App\Http\Controllers\api\ApiRegistereController;
 use App\Http\Controllers\api\LoginController;
@@ -59,9 +59,10 @@ Route::group([
     Route::post('/login', [AuthController::class, 'login']);
     Route::post('/register', [AuthController::class, 'register']);
     Route::post('/logout', [AuthController::class, 'logout']);
-    Route::post('/refresh', [AuthController::class, 'refresh']);
+    Route::post('/refresh-token', [AuthController::class, 'refresh']);
     Route::get('/user-profile', [AuthController::class, 'userProfile']);
     Route::post('/change-password', [AuthController::class, 'changePassWord']);
+    Route::get('/users', [AuthController::class, 'getAllUser']);
 });
 
 //==== PRODUCT APIS =====
@@ -108,11 +109,11 @@ Route::group([
     'middleware' => 'api',
     'prefix' => 'productImage'
 ], function ($router) {
-    Route::get('/all', [ApiProductImage::class, 'getAll']);
-    Route::get('/{productImageId}', [ApiProductImage::class, 'show']);
-    Route::post('/', [ApiProductImage::class, 'addNew']);
-    Route::put('/', [ApiProductImage::class, 'update']);
-    Route::delete('/{productImageId}', [ApiProductImage::class, 'delete']);
+    Route::get('/all', [ApiProductImageController::class, 'getAll']);
+    Route::get('/{productImageId}', [ApiProductImageController::class, 'show']);
+    Route::post('/', [ApiProductImageController::class, 'addNew']);
+    Route::put('/', [ApiProductImageController::class, 'update']);
+    Route::delete('/{productImageId}', [ApiProductImageController::class, 'delete']);
 });
 
 

@@ -5,10 +5,12 @@ namespace App\Http\Controllers\api;
 use App\Http\Resources\ProductCollection;
 use App\Http\Resources\ProductResource;
 use App\Models\ProductImage;
+use App\Http\Controllers\Controller;
+
 use Illuminate\Http\Request;
 use Validator;
 
-class ApiProductImage extends Controller
+class ApiProductImageController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -43,7 +45,7 @@ class ApiProductImage extends Controller
     public function addNew(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'product_id'=> 'required',
+            'product_id' => 'required',
             'path' => 'required'
         ]);
 
