@@ -22,7 +22,24 @@ class AuthController extends Controller
         $this->middleware('auth:api', ['except' => ['login', 'register']]);
     }
 
+    public function updateUser(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'id' => 'required'
+        ]);
 
+        if ($validator->fails()) {
+            return response()->json($validator->errors()->toJson(), 400);
+        }
+
+        $user = User::find($request->id);
+        if (is_null($user)) {
+            return response()->json(['error' => 'User Not Found'], 404);
+        }
+
+        $user->update($request->all());
+        return $user;
+    }
     public function getAllUser(Request $request)
     {
         return User::with("roles")->orderBy('updated_at', 'DESC')->get();

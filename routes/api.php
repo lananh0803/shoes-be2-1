@@ -63,6 +63,7 @@ Route::group([
     Route::get('/user-profile', [AuthController::class, 'userProfile']);
     Route::post('/change-password', [AuthController::class, 'changePassWord']);
     Route::get('/users', [AuthController::class, 'getAllUser']);
+    Route::put('/user/update', [AuthController::class, 'updateUser']);
 });
 
 //==== PRODUCT APIS =====
