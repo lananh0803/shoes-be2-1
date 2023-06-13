@@ -64,6 +64,7 @@ Route::group([
     Route::post('/change-password', [AuthController::class, 'changePassWord']);
     Route::get('/users', [AuthController::class, 'getAllUser']);
     Route::put('/user/update', [AuthController::class, 'updateUser']);
+    Route::delete('/user/{userId}', [AuthController::class, 'deleteUser']);
 });
 
 //==== PRODUCT APIS =====

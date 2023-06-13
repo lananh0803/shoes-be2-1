@@ -22,6 +22,14 @@ class AuthController extends Controller
         $this->middleware('auth:api', ['except' => ['login', 'register']]);
     }
 
+    public function deleteUser($userId)
+    {
+        $user = User::find($userId);
+        if (is_null($user)) {
+            return response()->json(['error' => 'User Not Found'], 404);
+        }
+        return $user->delete();
+    }
     public function updateUser(Request $request)
     {
         $validator = Validator::make($request->all(), [
